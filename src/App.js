@@ -23,7 +23,7 @@ function App() {
    *
    *
    *
-   * @param {*} e
+   * @param {*} 
    */
 
   const handleInputChange = (e) => {
