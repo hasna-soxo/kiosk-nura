@@ -17,8 +17,8 @@ function App() {
   const [patientname, setPatientname] = useState("");
   const [currentState, setCurrentState] = useState(states.input);
   const [isKioskMode, setIsKioskMode] = useState(false);
-  const [startDragPoint, setStartDragPoint] = useState({ x: 50, y: 50 });
-  const [endDragPoint, setEndDragPoint] = useState({ x: 30, y: 30 });
+  const [startDragPoint, setStartDragPoint] = useState("");
+  const [endDragPoint, setEndDragPoint] = useState("");
   /**
    *
    *
@@ -34,7 +34,7 @@ function App() {
    */
   const handleSubmit = () => {
     console.log(inputValue);
-    const patientname = "ROBERT"; // Replace this with your logic to fetch the name based on inputValue
+    const patientname = "ROBERT";
     setPatientname(patientname);
     setCurrentState(states.result);
   };
@@ -50,56 +50,39 @@ function App() {
   const handleDragStart = (event) => {
     // Store the starting point when dragging starts
     setStartDragPoint({ x: event.clientX, y: event.clientY });
+    console.log("Starting point:", { x: event.clientX, y: event.clientY });
   };
 
   const handleDragEnd = (event) => {
     // Store the ending point when dragging ends
-    setEndDragPoint({ x: event.clientX, y: event.clientY });
+    // setEndDragPoint({ x: event.clientX, y: event.clientY });
 
-    // Calculate the distance dragged (optional)
-    const distanceDraggedX = endDragPoint.x - startDragPoint.x;
-    const distanceDraggedY = endDragPoint.y - startDragPoint.y;
-    console.log("Distance dragged (X, Y):", distanceDraggedX, distanceDraggedY);
+    let endDragPoint = { x: event.clientX, y: event.clientY };
 
-    // Now, you can use the startDragPoint and endDragPoint for further processing
-    console.log("Starting point:", startDragPoint);
-    console.log("Ending point:", endDragPoint);
-  };
+    console.log("Ending point:", { x: event.clientX, y: event.clientY });
 
-  const handleDrag = (event) => {
-    console.log({ event });
-    event.preventDefault();
-    const dragThreshold = 20;
-    const distanceX = event.clientX - startDragPoint.x;
-    const distanceY = event.clientY - startDragPoint.y;
-
-    // Determine if the drag is primarily horizontal or vertical based on the distance comparison
+    // Check if the drag is in progress (startDragPoint has been set)
     if (
-      Math.abs(distanceX) < dragThreshold ||
-      Math.abs(distanceY) < dragThreshold
+      startDragPoint.x > endDragPoint.x &&
+      startDragPoint.y < endDragPoint.y
     ) {
-      // Only consider it a valid drag if the movement is significant enough
-      console.log("Valid Drag");
-      if (isKioskMode && currentState === states.input) {
-        setIsKioskMode(!isKioskMode);
-      }
+      setIsKioskMode(false);
     } else {
-      // Ignore the drag event if it's not significant enough
-      console.log("Ignored Drag");
+      setIsKioskMode(true);
     }
   };
 
   const isInputEmpty = inputValue.trim() === "";
 
-  // useEffect(() => {
-  //   if (currentState === states.continue) {
-  //     const timeoutId = setTimeout(() => {
-  //       setCurrentState(states.input);
-  //     }, 5000);
+  useEffect(() => {
+    if (currentState === states.continue) {
+      const timeoutId = setTimeout(() => {
+        setCurrentState(states.input);
+      }, 5000);
 
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [currentState]);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentState]);
 
   const renderContent = () => {
     switch (currentState) {
@@ -111,8 +94,8 @@ function App() {
             }`}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
-             onDrag={handleDrag}
-            draggable="false"
+            // onDrag={handleDrag}
+            draggable="true"
           >
             <div
               className="main_container"
@@ -163,8 +146,7 @@ function App() {
                     style={{
                       width: "130px",
                       height: "45px",
-                      //  position:"fixed",
-                      // position: "absolute",
+
                       bottom: 0,
                       right: 0,
                     }}
